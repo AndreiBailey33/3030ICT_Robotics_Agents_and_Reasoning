@@ -1,0 +1,50 @@
+﻿// This file defines the environment of the Robot simulation.
+#include "robot_model.csp";
+
+#define Unvisited -1;
+#define Visited 0;
+
+// Size of the map.
+#define NoOfRows 11;
+#define NoOfCols 11;
+
+// Boundries of Robots survey area.
+#define UpBoundry 0;
+#define DownBoundry 10;
+#define LeftBoundry 0;
+#define RightBoundry 10;
+
+hvar Boundry[4]:{0..10} = [UpBoundry, DownBoundry, LeftBoundry, RightBoundry];
+
+// The world matrix.
+var world[NoOfRows][NoOfCols]:{Unvisited..Visited} = [Unvisited(NoOfRows * NoOfCols)];
+
+// Whether delivery signal is sent.
+var deliverySignalSent:{0..1} = 0;
+
+// The following section models the possible actions the robo can take.
+
+MoveUp(boundry) = 
+    [pos[0] != boundry[0]]moveup{pos[0] = pos[0] - 1;
+    world[pos[0]][pos[1]] = Visited;}
+    -> Skip;
+
+MoveDown(boundry) =
+    [pos[0] != boundry[1]]movedown{pos[0] = pos[0] + 1;
+    world[pos[0]][pos[1]] = Visited;}
+    -> Skip;
+
+MoveLeft(boundry) =
+    [pos[1] != boundry[2]]moveleft{pos[1] = pos[1] - 1;
+    world[pos[0]][pos[1]] = Visited;}
+    -> Skip;
+
+MoveRight(boundry) =
+    [pos[1] != boundry[3]]moveright{pos[1] = pos[1] + 1;
+    world[pos[0]][pos[1]] = Visited;}
+    -> Skip;
+
+// Action for delivering a package.
+RobotDeliveredPackage() = [(pos[0] == posTarget[0] && pos[1] == posTarget[1])]robotdeliveredpackage{deliverySignalSent = 1;} -> Skip;
+
+RobotOperators() = MoveUp(Boundry) [] MoveDown(Boundry) [] MoveLeft(Boundry) [] MoveRight(Boundry) [] RobotDeliveredPackage();

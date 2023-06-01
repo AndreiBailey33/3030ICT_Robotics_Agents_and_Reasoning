@@ -1,0 +1,37 @@
+#include "robot_tasks.csp";
+
+// Goal: Robot has arrvied back home.
+#define goalRobotReturnHome ((pos[0] == 0) && (pos[1] == 0));
+
+// Goal: Robot has completed survey and delivery point isnt within bounds.
+#define goalRobotCompleteSurvey (&& i:{UpBoundry..DownBoundry}@
+	(&& j:{LeftBoundry..RightBoundry}@(world[i][j] == Visited)));		
+
+// Goal: Delievey has been made
+#define goalDeliverySignalSent (deliverySignalSent == 1);
+
+// Compound goal: either survey is completed OR Delivery Has been made.
+#define goalRobotSuccessfulSurvey 
+	(((&& i:{UpBoundry..DownBoundry}@(posTarget[0] != i)) ||
+	  (&& j:{LeftBoundry..RightBoundry}@(posTarget[1] != j))) && 
+	 goalRobotCompleteSurvey) || goalDeliverySignalSent;
+
+// Goal: Robot has delivered package and is back home.
+#define goalOverall (goalRobotReturnHome && goalRobotSuccessfulSurvey);
+
+// Processes.
+
+DeliverySignalSent() = [!goalDeliverySignalSent]RobotRun();DeliverySignalSent();
+
+CompleteSurvey() = [!goalDeliverySignalSent && !goalRobotCompleteSurvey]
+	RobotRun();CompleteSurvey();
+	
+SurveyFinished() = DeliverySignalSent() [] CompleteSurvey();
+
+ReturnedHome() = [!goalRobotReturnHome]RobotRun();ReturnedHome();
+
+OverallGoal() = SurveyFinished();ReturnedHome();
+
+Goal() = OverallGoal();
+
+#assert Goal() reaches goalOverall;

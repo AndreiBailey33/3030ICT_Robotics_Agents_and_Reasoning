@@ -1,0 +1,15 @@
+﻿#include "robot_envir.csp";
+
+// Define Robot movement in terms of primitive actions: MoveUp, MoveDown, MoveLeft, MoveRight.
+Move(boundry) = MoveUp(boundry) [] MoveDown(boundry) [] MoveLeft(boundry) [] MoveRight(boundry); RobotRun();
+
+// Define survey action, to keep robot looking for delivery location at all points.
+RoboSurvey() = Move(Boundry); RobotRun();
+
+// Define action for if the delivery location is reached, deliver the package and return home.    			   
+RoboDeliver() = RobotDeliveredPackage(); Move(Boundry); RobotRun();
+
+// Define how the Robot runs.
+RobotRun() = RoboSurvey() [] RoboDeliver();
+
+
