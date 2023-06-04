@@ -6,9 +6,9 @@ bool get_moves(assignment3::get_move::Request &req, assignment3::get_move::Respo
 
     std::ofstream MyFile(infile.c_str());
 
-    MyFile << "var pos[2]:{0..5} = ["<<req.x1<<","<<req.y1<<"];\n\n";
+    MyFile << "var pos[2]:{0..10} = ["<<req.x1<<","<<req.y1<<"];\n\n";
     // Write to the file
-    MyFile << "var posTarget[2]:{0..5} = ["<<req.x2<<","<<req.y2<<"];";
+    MyFile << "var posTarget[2]:{0..10} = ["<<req.x2<<","<<req.y2<<"];";
     // Close the file
     MyFile.close();
 
